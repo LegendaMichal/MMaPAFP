@@ -3,9 +3,15 @@
 #include <QPainterPath>
 #include <QtMath>
 #include <QVector2D>
+#include <QGraphicsSceneMouseEvent>
+#include <QPen>
+#include <QColor>
+#include <QDebug>
 
-Bone2::Bone2(float x, float y, float length, double angle, QGraphicsPathItem *parent)
-    : QGraphicsPathItem(parent)
+QStringList Bone2::_bone_names = QStringList();
+
+Bone2::Bone2(float x, float y, float length, double angle, QString name)
+    : QGraphicsPathItem(nullptr)
     , _length(length)
 {
     setPos(x, y);
@@ -14,35 +20,33 @@ Bone2::Bone2(float x, float y, float length, double angle, QGraphicsPathItem *pa
 
     setTransformOriginPoint(QPointF(0, 5));
 
-    setRotation(angle);
+    setAngle(angle);
     _b = pointOf(pos(), rotation(), _length);
 
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
+    setName(name);
 }
 
-Bone2::Bone2(Bone2 &parentBone, float length, double angle, QGraphicsPathItem *parent)
-    : QGraphicsPathItem(parent)
-    , _length(length)
-    , _parentBone(&parentBone)
+Bone2::Bone2(Bone2 &parentBone, float length, double angle, QString name)
+    : QGraphicsPathItem(nullptr)
 {
-    _b = pointOf(parentBone._b, 0, _length);
-    setPath(createShape(_length));
+    setLength(length);
 
     setTransformOriginPoint(QPointF(0, 5));
 
     setPos(parentBone._b);
-    setRotation(angle);
+    setAngle(angle);
     _b = pointOf(pos(), rotation(), _length);
 
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 
-    parentBone.addChild(this);
+    setParentBone(&parentBone);
+    setName(name);
 }
 
-Bone2::Bone2(Bone2 &parentBone, const QPointF &endPoint, QGraphicsPathItem *parent)
-    : QGraphicsPathItem(parent)
+Bone2::Bone2(Bone2 &parentBone, const QPointF &endPoint, QString name)
+    : QGraphicsPathItem(nullptr)
     , _b(endPoint)
-    , _parentBone(&parentBone)
 {
     setPos(parentBone._b);
 
@@ -51,42 +55,18 @@ Bone2::Bone2(Bone2 &parentBone, const QPointF &endPoint, QGraphicsPathItem *pare
 
     setTransformOriginPoint(QPointF(0, 5));
 
-    setRotation(angleFor(pos(), _b));
+    setAngle(angleFor(pos(), _b));
     _b = pointOf(pos(), rotation(), _length);
 
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 
-    parentBone.addChild(this);
+    setParentBone(&parentBone);
+    setName(name);
 }
 
-void Bone2::rotate(float angle)
+Bone2::~Bone2()
 {
-    setRotation(int(rotation() + angle) % 360);
-
-    _b = pointOf(pos(), rotation(), _length);
-    if (_childBones.size() > 0)
-    {
-        for (auto childBone : _childBones)
-        {
-            childBone->parentsUpdate(_b, angle);
-        }
-    }
-}
-
-void Bone2::rotateAbsolute(float angle)
-{
-    angle = qRadiansToDegrees(angle);
-    float angleR = angle - rotation();
-    setRotation(angle);
-
-    _b = pointOf(pos(), rotation(), _length);
-    if (_childBones.size() > 0)
-    {
-        for (auto childBone : _childBones)
-        {
-            childBone->parentsUpdate(_b, angleR);
-        }
-    }
+    _bone_names.removeOne(_name);
 }
 
 void Bone2::toTarget(const QPointF &target, Bone2 *child)
@@ -116,42 +96,173 @@ void Bone2::toTarget(const QPointF &target, Bone2 *child)
         _b = pointOf(pos(), rotation(), _length);
         for (auto childBone : _childBones)
         {
-            childBone->setPosRec(_b);
+            childBone->moveTo(_b);
         }
     }
     else if (_parentBone != nullptr)
     {
         _parentBone->toTarget(pos(), this);
     }
+    emit angleChanged();
+    emit positionChanged();
 }
 
-void Bone2::removeFromParent()
+void Bone2::detach()
+{
+    detachFromParent();
+    detachFromChildren(this);
+}
+
+QPointF Bone2::endPos()
+{
+    return _b;
+}
+
+void Bone2::anchorFirstParent()
+{
+    if (_parentBone == nullptr)
+    {
+        anchor();
+    }
+    else
+    {
+        _parentBone->anchorFirstParent();
+    }
+}
+
+void Bone2::detachFromParent()
 {
     if (_parentBone != nullptr)
     {
         _parentBone->_childBones.removeOne(this);
+        _parentBone = nullptr;
     }
 }
 
-void Bone2::removeFromChild()
+Bone2* Bone2::childBonesContains(Bone2 * bone)
+{
+    Bone2* result = nullptr;
+    if (bone == nullptr)
+        return result;
+
+    for (auto child : _childBones)
+    {
+        if (bone == child->_parentBone || result != nullptr)
+        {
+            return child;
+        }
+        else
+        {
+            result = child->childBonesContains(bone);
+        }
+    }
+    return result;
+}
+
+void Bone2::detachFromChildren(Bone2* bone)
 {
     for (auto child : _childBones)
     {
         child->_parentBone = nullptr;
+        _childBones.removeOne(bone);
     }
 }
 
-QPointF Bone2::anchor()
+void Bone2::anchor()
 {
-    if (_anchorAt.isNull())
+    _anchored = !_anchored;
+    if (_anchored)
     {
+        setPen(QPen(QColor(233, 30, 33, 212)));
         _anchorAt = pos();
     }
     else
     {
+        setPen(QPen(QColor(0, 0, 0)));
         _anchorAt = QPointF();
     }
-    return _anchorAt;
+}
+
+void Bone2::setName(const QString &name)
+{
+    int it = 1;
+    QString tmpName = name;
+    while (_bone_names.contains(tmpName))
+    {
+        tmpName = name + "_" + QString::number(it);
+        it++;
+    }
+    _bone_names.removeOne(_name);
+    _name = tmpName;
+    _bone_names.append(_name);
+}
+
+QString Bone2::name()
+{
+    return _name;
+}
+
+void Bone2::setParentBone(Bone2 *parent)
+{
+    detachFromParent();
+    Bone2* child = childBonesContains(this);
+    if (child != nullptr)
+    {
+        child->_parentBone = nullptr;
+        _childBones.removeOne(child);
+    }
+
+    _parentBone = parent;
+    if (_parentBone != nullptr)
+    {
+        _parentBone->addChild(this);
+        moveTo(_parentBone->_b);
+
+        for (auto childBone : _childBones)
+        {
+            childBone->moveTo(_b);
+        }
+    }
+    if (_anchored)
+    {
+        anchor();
+        _parentBone->anchorFirstParent();
+    }
+}
+
+Bone2* Bone2::parentBone() const
+{
+    return _parentBone;
+}
+
+void Bone2::setLength(int len)
+{
+    _length = len;
+    _b = pointOf(pos(), rotation(), _length);
+    setPath(createShape(_length));
+
+    for (auto childBone : _childBones)
+    {
+        childBone->moveTo(_b);
+    }
+}
+
+int Bone2::length()
+{
+    return _length;
+}
+
+void Bone2::setAngle(float angle)
+{
+    angle = convertAngleIn(angle);
+    setAnglePrivate(angle);
+    emit angleChanged();
+}
+
+
+float Bone2::angle()
+{
+    return convertAngleOut(rotation());
 }
 
 void Bone2::toBkTarget(const QPointF &bkTarget)
@@ -181,20 +292,20 @@ void Bone2::addChild(Bone2 *childBone)
     _childBones.append(childBone);
 }
 
-void Bone2::setPosRec(QPointF &point)
+void Bone2::moveTo(const QPointF &point)
 {
     setPos(point);
     _b = pointOf(pos(), rotation(), _length);
     for (auto child : _childBones)
     {
-        child->setPosRec(_b);
+        child->moveTo(_b);
     }
 }
 
 void Bone2::parentsUpdate(const QPointF &position, float angle)
 {
     setPos(position);
-    rotate(angle);
+    setAnglePrivate(angle);
     _b = pointOf(position, rotation(), _length);
 }
 
@@ -233,4 +344,29 @@ QPainterPath Bone2::createShape(float len) const
     path.lineTo(QPointF(0, 10));
     path.lineTo(QPointF(0, 0));
     return path;
+}
+
+float Bone2::convertAngleIn(float angle) const
+{
+    return angle - 90;
+}
+
+float Bone2::convertAngleOut(float angle) const
+{
+    return angle + 90;
+}
+
+void Bone2::setAnglePrivate(float angle)
+{
+    float deltaRot = angle - rotation();
+    setRotation(angle);
+
+    _b = pointOf(pos(), rotation(), _length);
+    if (_childBones.size() > 0)
+    {
+        for (auto childBone : _childBones)
+        {
+            childBone->parentsUpdate(_b, childBone->rotation() + deltaRot);
+        }
+    }
 }

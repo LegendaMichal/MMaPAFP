@@ -4,8 +4,10 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 
+#include "bone2.h"
+
 enum GraphicsWindowMode {
-    Rotation, Selection, Follow
+    Edit, Rotate, Move
 };
 
 class GraphicsWindow : public QGraphicsView
@@ -14,19 +16,22 @@ class GraphicsWindow : public QGraphicsView
 public:
     GraphicsWindow(QWidget *parent = nullptr);
     void setMode(GraphicsWindowMode mode);
-    void rotateSelected(float angle);
+    void loadBones(QList<Bone2*> bones);
     void resetBones();
     void removeSelected();
     void removeAll();
-    void anchorLast();
+    void deselect();
+    QList<Bone2*> bones() const;
+    void addBone(Bone2 *bone);
 
 signals:
     void afterShowEvent();
-    void itemSelected(bool selected);
+    void itemSelected(Bone2* selected);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -37,7 +42,7 @@ private slots:
 
 private:
     int _keyCombo = 0;
-    GraphicsWindowMode _mode = GraphicsWindowMode::Selection;
+    GraphicsWindowMode _mode = GraphicsWindowMode::Edit;
     QPointF _rotationStartingPoint;
     bool _firstShow = true;
     QGraphicsScene _scene;

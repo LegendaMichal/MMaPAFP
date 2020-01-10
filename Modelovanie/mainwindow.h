@@ -2,7 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QButtonGroup>
+#include <QActionGroup>
+#include "bone2.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,19 +19,46 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_btnTurnLeft_clicked();
-    void on_btnTurnRight_clicked();
-    void on_itemSelected(bool selected);
-    void on_btnReset_clicked();
-    void on_btnRemove_clicked();
-    void on_btnRemoveAll_clicked();
-    void on_btnRotation_clicked();
-    void on_btnSelection_clicked();
-    void on_btnFollow_clicked();
-    void on_btnAnchor_clicked();
+    void on_itemSelected(Bone2 *selected);
+    void on_actionShow_Properties_toggled(bool toggled);
+    void on_leBoneName_textChanged(const QString &name);
+    void on_actionRemove_selected_triggered();
+    void on_actionClose_triggered();
+    void on_actionClear_board_triggered();
+
+    void on_sbLength_valueChanged(int len);
+
+    void on_cbBonePs_currentIndexChanged(int index);
+
+    void on_actionEdit_toggled(bool val);
+    void on_actionRotation_toggled(bool val);
+    void on_actionFollow_toggled(bool val);
+
+    void on_actionAdd_new_triggered();
+
+    void on_sbPosX_valueChanged(int val);
+    void on_sbPosY_valueChanged(int val);
+
+    void on_btnAddBone_clicked();
+
+    void on_sbRotation_valueChanged(double angle);
+
+    void on_updateAngle();
+    void on_updatePosition();
+
+    void on_actionAnchor_triggered();
+
+    void on_actionSave_bones_triggered();
+
+    void on_actionLoad_bones_triggered();
 
 private:
+    void connectBoneSignals(Bone2* bone);
+    void disconnectBoneSignals(Bone2* bone);
+
     Ui::MainWindow *ui;
-    QButtonGroup _btnGrp;
+    QActionGroup _actionGrp;
+
+    Bone2* _selectedBone = nullptr;
 };
 #endif // MAINWINDOW_H
