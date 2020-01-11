@@ -47,7 +47,6 @@ protected:
 
     // zle nazvane funkcie
     void parentsUpdate(const QPointF &position, float angle);
-    void toBkTarget(const QPointF &bkTarget);
 
     // Prepocty
     QPointF pointOf(const QPointF &pos, float angle, float length) const;
@@ -59,6 +58,8 @@ private:
     QPainterPath createShape(float len) const;
     float convertAngleIn(float angle) const;
     float convertAngleOut(float angle) const;
+    void toTargetForParent(const QPointF &target, Bone2* child = nullptr);
+    void toTargetForChild(const QPointF &bkTarget);
     void setAnglePrivate(float angle);
 
     float _length = 0;

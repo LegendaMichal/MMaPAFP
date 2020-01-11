@@ -6,6 +6,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPen>
 #include <QColor>
+#include <QDebug>
 
 QStringList Bone2::_bone_names = QStringList();
 
@@ -70,23 +71,22 @@ Bone2::~Bone2()
 
 void Bone2::toTarget(const QPointF &target, Bone2 *child)
 {
-    float angle = float(int(angleFor(target, pos()) + 180) % 360);
+    float angle = convertAngleIn(convertAngleIn(angleFor(target, pos())));
     setRotation(angle);
-    QVector2D tar(target);
-    QVector2D dir = tar - QVector2D(pos());
 
-    // set magnitude
-    float actualMag = qSqrt(qPow(dir.x(), 2) + qPow(dir.y(), 2));
-    dir = dir * _length / actualMag;
+    QVector2D newDirection(target.x() - pos().x(), target.y() - pos().y());
+    float newDirLen = newDirection.length();
+    newDirection = newDirection * _length / newDirLen;
+    QPointF newPos = pointOf(-newDirection, target);
 
-    setPos(pointOf(-dir, target));
+    setPos(newPos);
     _b = pointOf(pos(), rotation(), _length);
     if (_childBones.size() > 0)
     {
         for (auto childBone : _childBones)
         {
             if (child == nullptr || child != childBone)
-                childBone->toBkTarget(_b);
+                childBone->toTargetForChild(_b);
         }
     }
     if (!_anchorAt.isNull())
@@ -100,10 +100,10 @@ void Bone2::toTarget(const QPointF &target, Bone2 *child)
     }
     else if (_parentBone != nullptr)
     {
-        _parentBone->toTarget(pos(), this);
+        _parentBone->toTargetForParent(pos(), this);
     }
-    emit angleChanged();
-    emit positionChanged();
+//    emit angleChanged();
+//    emit positionChanged();
 }
 
 void Bone2::detach()
@@ -276,28 +276,6 @@ float Bone2::angle()
     return convertAngleOut(rotation());
 }
 
-void Bone2::toBkTarget(const QPointF &bkTarget)
-{
-    float angle = float(int(angleFor(_b, bkTarget) + 180) % 360);
-    setRotation(angle);
-    QVector2D tar(bkTarget);
-    QVector2D dir = tar - QVector2D(_b);
-
-    // set magnitude
-    float actualMag = qSqrt(qPow(dir.x(), 2) + qPow(dir.y(), 2));
-    dir = dir * _length / actualMag;
-
-    setPos(bkTarget);
-    _b = pointOf(pos(), rotation(), _length);
-        if (_childBones.size() > 0)
-    {
-        for (auto childBone : _childBones)
-        {
-            childBone->toBkTarget(_b);
-        }
-    }
-}
-
 void Bone2::addChild(Bone2 *childBone)
 {
     _childBones.append(childBone);
@@ -359,12 +337,66 @@ QPainterPath Bone2::createShape(float len) const
 
 float Bone2::convertAngleIn(float angle) const
 {
-    return angle - 90;
+    angle -= 90;
+    while (angle < 0)
+        angle += 360;
+    int rx = angle / 360;
+    return angle - (360 * rx); // zvysok pri float
 }
 
 float Bone2::convertAngleOut(float angle) const
 {
-    return angle + 90;
+    angle += 90;
+    while (angle < 0)
+        angle += 360;
+    int rx = angle / 360;
+    return angle - (360 * rx); // zvysok pri float
+}
+
+void Bone2::toTargetForParent(const QPointF &target, Bone2 *child)
+{
+
+    float angle = convertAngleIn(convertAngleIn(angleFor(target, pos())));
+    setRotation(angle);
+
+    QVector2D newDirection(target.x() - pos().x(), target.y() - pos().y());
+    float newDirLen = newDirection.length();
+    newDirection = newDirection * _length / newDirLen;
+    QPointF newPos = pointOf(-newDirection, target);
+
+    setPos(newPos);
+    _b = pointOf(pos(), rotation(), _length);
+    if (!_anchorAt.isNull())
+    {
+        setPos(_anchorAt);
+        _b = pointOf(pos(), rotation(), _length);
+        for (auto childBone : _childBones)
+        {
+            childBone->moveTo(_b);
+        }
+    }
+    else if (_parentBone != nullptr)
+    {
+        _parentBone->toTargetForParent(pos(), this);
+    }
+    emit angleChanged();
+    emit positionChanged();
+}
+
+void Bone2::toTargetForChild(const QPointF &bkTarget)
+{
+    float angle = convertAngleIn(convertAngleIn(angleFor(_b, bkTarget)));
+    setRotation(angle);
+
+    setPos(bkTarget);
+    _b = pointOf(pos(), rotation(), _length);
+    if (_childBones.size() > 0)
+    {
+        for (auto childBone : _childBones)
+        {
+            childBone->toTargetForChild(_b);
+        }
+    }
 }
 
 void Bone2::setAnglePrivate(float angle)
