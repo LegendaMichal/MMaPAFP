@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/tests">
+        <file alias="kabel">tests/kabel.bone</file>
+        <file alias="palma">tests/palma.bone</file>
+        <file alias="panak">tests/panacik.bone</file>
+        <file alias="ruka">tests/ruka.bone</file>
+    </qresource>
+</RCC>

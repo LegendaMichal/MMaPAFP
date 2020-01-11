@@ -4,7 +4,6 @@
 #include <QXmlStreamReader>
 #include <QFileDialog>
 #include <QDir>
-#include <QDebug>
 
 void FileController::saveFile(QWidget *parent, const QList<Bone2 *> &listOfBones)
 {
@@ -41,13 +40,16 @@ void FileController::saveFile(QWidget *parent, const QList<Bone2 *> &listOfBones
     file.close();
 }
 
-QList<Bone2*> FileController::openFile(QWidget *parent)
+QList<Bone2*> FileController::openFile(QWidget *parent, QString filename)
 {
-    QString fileName = QFileDialog::getOpenFileName(parent,
-        "Open Bones", QDir::currentPath(), "Bone Files (*.bone)");
+    if (filename.isEmpty())
+    {
+        filename = QFileDialog::getOpenFileName(parent,
+            "Open Bones", QDir::currentPath(), "Bone Files (*.bone)");
+    }
 
     QList<Bone2*> bones;
-    QFile file(fileName);
+    QFile file(filename);
     if (file.open(QIODevice::ReadOnly | QFile::Text))
     {
 

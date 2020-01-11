@@ -2,7 +2,6 @@
 
 #include <QKeyEvent>
 #include <QGraphicsEllipseItem>
-#include <QDebug>
 #include <QtMath>
 #include <QApplication>
 
@@ -22,7 +21,6 @@ void GraphicsWindow::setMode(GraphicsWindowMode mode)
 
 void GraphicsWindow::loadBones(QList<Bone2*> bones)
 {
-    removeAll();
     for (auto bone : bones)
     {
         _scene.addItem(bone);
@@ -51,6 +49,7 @@ void GraphicsWindow::removeSelected()
         Bone2* bone = static_cast<Bone2*>(items[0]);
         bone->detach();
         _scene.removeItem(bone);
+        bone->deleteLater();
     }
 }
 
@@ -91,26 +90,6 @@ void GraphicsWindow::addBone(Bone2 *bone)
     emit itemSelected(bone);
 }
 
-void GraphicsWindow::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Shift && (_keyCombo & Qt::Key_Shift) != Qt::Key_Shift)
-    {
-        _keyCombo |= Qt::Key_Shift;
-    }
-    else
-        QGraphicsView::keyPressEvent(event);
-}
-
-void GraphicsWindow::keyReleaseEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Shift && (_keyCombo & Qt::Key_Shift) == Qt::Key_Shift)
-    {
-        _keyCombo &= ~Qt::Key_Shift;
-    }
-    else
-        QGraphicsView::keyPressEvent(event);
-}
-
 void GraphicsWindow::mouseDoubleClickEvent(QMouseEvent *event)
 {
     mousePressEvent(event);
@@ -121,7 +100,6 @@ void GraphicsWindow::mousePressEvent(QMouseEvent *event)
     QGraphicsItem *item = nullptr;
     if (event->button() == Qt::LeftButton)
     {
-        qDebug() << "LeftButton";
         if (_mode == GraphicsWindowMode::Edit
             && (item = itemAt(event->pos())) != nullptr)
         {
@@ -137,10 +115,6 @@ void GraphicsWindow::mousePressEvent(QMouseEvent *event)
                 Bone2* bone = static_cast<Bone2*>(item);
                 emit itemSelected(bone);
             }
-        }
-        else if (_mode == GraphicsWindowMode::Rotate)
-        {
-            _rotationStartingPoint = event->pos();
         }
     }
     else if (event->button() == Qt::RightButton)
@@ -165,17 +139,16 @@ void GraphicsWindow::mouseMoveEvent(QMouseEvent *event)
             selected->toTarget(event->pos());
         }
     }
-    else if (_mode == GraphicsWindowMode::Rotate && !_rotationStartingPoint.isNull())
+    else if (_mode == GraphicsWindowMode::Rotate)
     {
         QList<QGraphicsItem*> items = scene()->selectedItems();
         if (items.size() == 1)
         {
-            QVector2D dirVector(event->x() - _rotationStartingPoint.x(), event->y() - _rotationStartingPoint.y());
+            QVector2D dirVector(event->x() - items[0]->pos().x(), event->y() - items[0]->pos().y());
             QVector2D verVector(0, -1);
             float angle = qRadiansToDegrees(qAcos((QVector2D::dotProduct(dirVector, verVector))/(dirVector.length()*verVector.length())));
             if (dirVector.x() < 0)
                 angle = 360 - angle;
-            qDebug() << angle;
             Bone2 *selected = static_cast<Bone2*>(items[0]);
             selected->setAngle(angle);
         }

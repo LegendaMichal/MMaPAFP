@@ -67,12 +67,21 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuTest">
+     <property name="title">
+      <string>Test</string>
+     </property>
+     <addaction name="actionkabel"/>
+     <addaction name="actionpalma"/>
+     <addaction name="actionpanacik"/>
+     <addaction name="actionruka"/>
+    </widget>
     <addaction name="actionClear_board"/>
     <addaction name="separator"/>
-    <addaction name="actionLoad_bones"/>
     <addaction name="actionSave_bones"/>
+    <addaction name="actionLoad_bones"/>
     <addaction name="separator"/>
-    <addaction name="actionTest"/>
+    <addaction name="menuTest"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
    </widget>
@@ -506,11 +515,6 @@ QLineEdit, QSpinBox {
     <string>Shift+R</string>
    </property>
   </action>
-  <action name="actionTest">
-   <property name="text">
-    <string>Test</string>
-   </property>
-  </action>
   <action name="actionAdd_new">
    <property name="text">
     <string>Add</string>
@@ -522,6 +526,26 @@ QLineEdit, QSpinBox {
   <action name="actionAnchor">
    <property name="text">
     <string>Anchor</string>
+   </property>
+  </action>
+  <action name="actionkabel">
+   <property name="text">
+    <string>kabel</string>
+   </property>
+  </action>
+  <action name="actionpanacik">
+   <property name="text">
+    <string>panacik</string>
+   </property>
+  </action>
+  <action name="actionpalma">
+   <property name="text">
+    <string>palma</string>
+   </property>
+  </action>
+  <action name="actionruka">
+   <property name="text">
+    <string>ruka</string>
    </property>
   </action>
  </widget>

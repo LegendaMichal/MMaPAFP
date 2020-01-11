@@ -52,6 +52,14 @@ private slots:
 
     void on_actionLoad_bones_triggered();
 
+    void on_actionkabel_triggered();
+
+    void on_actionpanacik_triggered();
+
+    void on_actionpalma_triggered();
+
+    void on_actionruka_triggered();
+
 private:
     void connectBoneSignals(Bone2* bone);
     void disconnectBoneSignals(Bone2* bone);

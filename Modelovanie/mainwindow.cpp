@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QDebug>
 #include "filecontroller.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -255,7 +254,6 @@ void MainWindow::connectBoneSignals(Bone2 *bone)
 {
     if (bone != nullptr)
     {
-        qDebug() << "connecting";
         connect(bone, SIGNAL(angleChanged()), this, SLOT(on_updateAngle()));
         connect(bone, SIGNAL(positionChanged()), this, SLOT(on_updatePosition()));
     }
@@ -285,4 +283,28 @@ void MainWindow::on_actionLoad_bones_triggered()
 {
     ui->graphicsView->removeAll();
     ui->graphicsView->loadBones(FileController::openFile(this));
+}
+
+void MainWindow::on_actionkabel_triggered()
+{
+    ui->graphicsView->removeAll();
+    ui->graphicsView->loadBones(FileController::openFile(this, ":/tests/kabel"));
+}
+
+void MainWindow::on_actionpanacik_triggered()
+{
+    ui->graphicsView->removeAll();
+    ui->graphicsView->loadBones(FileController::openFile(this, ":/tests/panak"));
+}
+
+void MainWindow::on_actionpalma_triggered()
+{
+    ui->graphicsView->removeAll();
+    ui->graphicsView->loadBones(FileController::openFile(this, ":/tests/palma"));
+}
+
+void MainWindow::on_actionruka_triggered()
+{
+    ui->graphicsView->removeAll();
+    ui->graphicsView->loadBones(FileController::openFile(this, ":/tests/ruka"));
 }

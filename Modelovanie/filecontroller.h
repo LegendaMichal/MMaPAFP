@@ -8,11 +8,7 @@ class FileController
 {
 public:
     static void saveFile(QWidget *parent, const QList<Bone2*> &listOfBones);
-    static QList<Bone2*> openFile(QWidget *parent);
-
-private:
-    static QByteArray createXml(const QList<Bone2*> &listOfBones);
-    static QList<Bone2 *> readXml(const QByteArray& xml);
+    static QList<Bone2*> openFile(QWidget *parent, QString filename = "");
 };
 
 #endif // FILECONTROLLER_H

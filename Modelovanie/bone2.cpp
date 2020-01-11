@@ -6,7 +6,6 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPen>
 #include <QColor>
-#include <QDebug>
 
 QStringList Bone2::_bone_names = QStringList();
 
@@ -55,7 +54,7 @@ Bone2::Bone2(Bone2 &parentBone, const QPointF &endPoint, QString name)
 
     setTransformOriginPoint(QPointF(0, 5));
 
-    setAngle(angleFor(pos(), _b));
+    setAngle(convertAngleOut(angleFor(pos(), _b)));
     _b = pointOf(pos(), rotation(), _length);
 
     setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
@@ -205,12 +204,24 @@ QString Bone2::name()
 void Bone2::setParentBone(Bone2 *parent)
 {
     detachFromParent();
-    Bone2* child = childBonesContains(this);
-    if (child != nullptr)
+    if (parent != nullptr)
     {
-        child->_parentBone = nullptr;
-        _childBones.removeOne(child);
+        if(parent->_parentBone == this)
+        {
+            parent->_parentBone = nullptr;
+            _childBones.removeOne(parent);
+        }
+        else
+        {
+            Bone2* child = parent->childBonesContains(this);
+            if (child != nullptr)
+            {
+                child->_parentBone = nullptr;
+                _childBones.removeOne(child);
+            }
+        }
     }
+
 
     _parentBone = parent;
     if (_parentBone != nullptr)

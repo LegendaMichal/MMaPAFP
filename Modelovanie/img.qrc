@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/icons/btns">
-        <file alias="TurnLeft">imgs/rotate-left-circular-arrow-interface-symbol.svg</file>
-        <file alias="TurnRight">imgs/rotating-arrow-to-the-right.svg</file>
-    </qresource>
-</RCC>
