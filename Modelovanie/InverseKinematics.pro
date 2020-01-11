@@ -8,6 +8,8 @@ DESTDIR = bin #Target file directory
 OBJECTS_DIR = obj #Intermediate object files directory
 MOC_DIR = obj
 
+RC_ICONS = IK.ico
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
