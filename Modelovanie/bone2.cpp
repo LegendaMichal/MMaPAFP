@@ -69,7 +69,7 @@ Bone2::~Bone2()
     _bone_names.removeOne(_name);
 }
 
-void Bone2::toTarget(const QPointF &target, Bone2 *child)
+void Bone2::toTarget(const QPointF &target)
 {
     float angle = convertAngleIn(convertAngleIn(angleFor(target, pos())));
     setRotation(angle);
@@ -81,13 +81,9 @@ void Bone2::toTarget(const QPointF &target, Bone2 *child)
 
     setPos(newPos);
     _b = pointOf(pos(), rotation(), _length);
-    if (_childBones.size() > 0)
+    for (auto childBone : _childBones)
     {
-        for (auto childBone : _childBones)
-        {
-            if (child == nullptr || child != childBone)
-                childBone->toTargetForChild(_b);
-        }
+        childBone->toTargetForChild(_b);
     }
     if (!_anchorAt.isNull())
     {
@@ -100,10 +96,10 @@ void Bone2::toTarget(const QPointF &target, Bone2 *child)
     }
     else if (_parentBone != nullptr)
     {
-        _parentBone->toTargetForParent(pos(), this);
+        _parentBone->toTargetForParent(pos());
     }
-//    emit angleChanged();
-//    emit positionChanged();
+    emit angleChanged();
+    emit positionChanged();
 }
 
 void Bone2::detach()
@@ -222,7 +218,6 @@ void Bone2::setParentBone(Bone2 *parent)
         }
     }
 
-
     _parentBone = parent;
     if (_parentBone != nullptr)
     {
@@ -291,7 +286,7 @@ void Bone2::moveTo(const QPointF &point)
     }
 }
 
-void Bone2::parentsUpdate(const QPointF &position, float angle)
+void Bone2::updateForChild(const QPointF &position, float angle)
 {
     setPos(position);
     setAnglePrivate(angle);
@@ -353,7 +348,7 @@ float Bone2::convertAngleOut(float angle) const
     return angle - (360 * rx); // zvysok pri float
 }
 
-void Bone2::toTargetForParent(const QPointF &target, Bone2 *child)
+void Bone2::toTargetForParent(const QPointF &target)
 {
 
     float angle = convertAngleIn(convertAngleIn(angleFor(target, pos())));
@@ -377,7 +372,7 @@ void Bone2::toTargetForParent(const QPointF &target, Bone2 *child)
     }
     else if (_parentBone != nullptr)
     {
-        _parentBone->toTargetForParent(pos(), this);
+        _parentBone->toTargetForParent(pos());
     }
     emit angleChanged();
     emit positionChanged();
@@ -409,7 +404,7 @@ void Bone2::setAnglePrivate(float angle)
     {
         for (auto childBone : _childBones)
         {
-            childBone->parentsUpdate(_b, childBone->rotation() + deltaRot);
+            childBone->updateForChild(_b, childBone->rotation() + deltaRot);
         }
     }
 }

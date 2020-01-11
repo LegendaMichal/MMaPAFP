@@ -15,7 +15,7 @@ public:
     Bone2(Bone2 &parentBone, float lenght, double angle, QString name = "Bone");
     Bone2(Bone2 &parentBone, const QPointF &endPoint, QString name = "Bone");
     ~Bone2();
-    void toTarget(const QPointF &target, Bone2* child = nullptr);
+    void toTarget(const QPointF &target);
     void detach();
     QPointF endPos();
     void anchorFirstParent();
@@ -45,9 +45,6 @@ protected:
     Bone2 *childBonesContains(Bone2 *bone);
     void detachFromChildren(Bone2 *bone);
 
-    // zle nazvane funkcie
-    void parentsUpdate(const QPointF &position, float angle);
-
     // Prepocty
     QPointF pointOf(const QPointF &pos, float angle, float length) const;
     QPointF pointOf(const QVector2D &vec, const QPointF &pos) const;
@@ -58,9 +55,10 @@ private:
     QPainterPath createShape(float len) const;
     float convertAngleIn(float angle) const;
     float convertAngleOut(float angle) const;
-    void toTargetForParent(const QPointF &target, Bone2* child = nullptr);
+    void toTargetForParent(const QPointF &target);
     void toTargetForChild(const QPointF &bkTarget);
     void setAnglePrivate(float angle);
+    void updateForChild(const QPointF &position, float angle);
 
     float _length = 0;
     QPointF _b = QPointF(0,0);
