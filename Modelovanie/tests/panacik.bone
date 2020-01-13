@@ -1,80 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bones>
     <bone>
-        <name>Bone_19</name>
+        <name>Bone_3</name>
+        <parent>body</parent>
         <position>
-            <x>397.5</x>
-            <y>416</y>
+            <x>432.301</x>
+            <y>470.776</y>
         </position>
-        <length>70</length>
-        <angle>207.951</angle>
+        <length>42</length>
+        <angle>150.832</angle>
     </bone>
     <bone>
-        <name>Bone_18</name>
+        <name>Bone_2</name>
+        <parent>body</parent>
         <position>
-            <x>397.5</x>
-            <y>416</y>
+            <x>432.301</x>
+            <y>470.776</y>
         </position>
-        <length>70</length>
-        <angle>151.091</angle>
+        <length>45</length>
+        <angle>219.028</angle>
     </bone>
     <bone>
-        <name>Bone_17</name>
-        <parent>Bone_6</parent>
+        <name>Bone_1</name>
+        <parent>head</parent>
         <position>
-            <x>397.5</x>
-            <y>326</y>
+            <x>422</x>
+            <y>416.749</y>
         </position>
-        <length>60</length>
-        <angle>133.264</angle>
+        <length>38</length>
+        <angle>119.38</angle>
     </bone>
     <bone>
-        <name>Bone_16</name>
-        <parent>Bone_6</parent>
+        <name>Bone</name>
+        <parent>head</parent>
         <position>
-            <x>397.5</x>
-            <y>326</y>
+            <x>422</x>
+            <y>416.749</y>
         </position>
-        <length>60</length>
-        <angle>228.013</angle>
+        <length>39</length>
+        <angle>248.897</angle>
     </bone>
     <bone>
-        <name>Bone_7</name>
-        <parent>Bone_6</parent>
+        <name>body</name>
+        <parent>head</parent>
         <position>
-            <x>397.5</x>
-            <y>326</y>
+            <x>422</x>
+            <y>416.749</y>
         </position>
-        <length>30</length>
-        <angle>0</angle>
+        <length>55</length>
+        <angle>169.205</angle>
     </bone>
     <bone>
-        <name>Bone_6</name>
-        <parent>Bone_5</parent>
+        <name>head</name>
         <position>
-            <x>397.5</x>
-            <y>356</y>
+            <x>417.818</x>
+            <y>382</y>
         </position>
-        <length>30</length>
-        <angle>0</angle>
-    </bone>
-    <bone>
-        <name>Bone_5</name>
-        <parent>Bone_4</parent>
-        <position>
-            <x>397.5</x>
-            <y>386</y>
-        </position>
-        <length>30</length>
-        <angle>0</angle>
-    </bone>
-    <bone>
-        <name>Bone_4</name>
-        <position>
-            <x>397.5</x>
-            <y>416</y>
-        </position>
-        <length>30</length>
-        <angle>0</angle>
+        <length>35</length>
+        <angle>173.138</angle>
     </bone>
 </bones>
