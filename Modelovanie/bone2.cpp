@@ -96,7 +96,7 @@ void Bone2::toTarget(const QPointF &target)
     }
     else if (_parentBone != nullptr)
     {
-        _parentBone->toTargetForParent(pos());
+        _parentBone->toTargetForParent(pos(), this);
     }
     emit angleChanged();
     emit positionChanged();
@@ -286,13 +286,6 @@ void Bone2::moveTo(const QPointF &point)
     }
 }
 
-void Bone2::updateForChild(const QPointF &position, float angle)
-{
-    setPos(position);
-    setAnglePrivate(angle);
-    _b = pointOf(position, rotation(), _length);
-}
-
 QPointF Bone2::pointOf(const QPointF &pos, float angle, float length) const
 {
     angle = qDegreesToRadians(angle);
@@ -348,7 +341,7 @@ float Bone2::convertAngleOut(float angle) const
     return angle - (360 * rx); // zvysok pri float
 }
 
-void Bone2::toTargetForParent(const QPointF &target)
+void Bone2::toTargetForParent(const QPointF &target, const Bone2* child)
 {
 
     float angle = convertAngleIn(convertAngleIn(angleFor(target, pos())));
@@ -361,6 +354,11 @@ void Bone2::toTargetForParent(const QPointF &target)
 
     setPos(newPos);
     _b = pointOf(pos(), rotation(), _length);
+    for (auto childBone : _childBones)
+    {
+        if (child != childBone)
+            childBone->toTargetForChild(_b);
+    }
     if (!_anchorAt.isNull())
     {
         setPos(_anchorAt);
@@ -372,7 +370,7 @@ void Bone2::toTargetForParent(const QPointF &target)
     }
     else if (_parentBone != nullptr)
     {
-        _parentBone->toTargetForParent(pos());
+        _parentBone->toTargetForParent(pos(), child);
     }
     emit angleChanged();
     emit positionChanged();
@@ -392,6 +390,13 @@ void Bone2::toTargetForChild(const QPointF &bkTarget)
             childBone->toTargetForChild(_b);
         }
     }
+}
+
+void Bone2::updateForChild(const QPointF &position, float angle)
+{
+    setPos(position);
+    setAnglePrivate(angle);
+    _b = pointOf(position, rotation(), _length);
 }
 
 void Bone2::setAnglePrivate(float angle)

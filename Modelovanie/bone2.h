@@ -55,7 +55,7 @@ private:
     QPainterPath createShape(float len) const;
     float convertAngleIn(float angle) const;
     float convertAngleOut(float angle) const;
-    void toTargetForParent(const QPointF &target);
+    void toTargetForParent(const QPointF &target, const Bone2* child);
     void toTargetForChild(const QPointF &bkTarget);
     void setAnglePrivate(float angle);
     void updateForChild(const QPointF &position, float angle);
