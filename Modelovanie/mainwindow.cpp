@@ -185,14 +185,14 @@ void MainWindow::on_btnAddBone_clicked()
 
 void MainWindow::on_actionRemove_selected_triggered()
 {
-    ui->graphicsView->removeSelected();
     ui->graphicsView->deselect();
+    ui->graphicsView->removeSelected();
 }
 
 void MainWindow::on_actionClear_board_triggered()
 {
-    ui->graphicsView->removeAll();
     ui->graphicsView->deselect();
+    ui->graphicsView->removeAll();
 }
 
 void MainWindow::on_actionClose_triggered()
@@ -281,30 +281,30 @@ void MainWindow::on_actionSave_bones_triggered()
 
 void MainWindow::on_actionLoad_bones_triggered()
 {
-    ui->graphicsView->removeAll();
+    on_actionClear_board_triggered();
     ui->graphicsView->loadBones(FileController::openFile(this));
 }
 
 void MainWindow::on_actionkabel_triggered()
 {
-    ui->graphicsView->removeAll();
+    on_actionClear_board_triggered();
     ui->graphicsView->loadBones(FileController::openFile(this, ":/tests/kabel"));
 }
 
 void MainWindow::on_actionpanacik_triggered()
 {
-    ui->graphicsView->removeAll();
+    on_actionClear_board_triggered();
     ui->graphicsView->loadBones(FileController::openFile(this, ":/tests/panak"));
 }
 
 void MainWindow::on_actionpalma_triggered()
 {
-    ui->graphicsView->removeAll();
+    on_actionClear_board_triggered();
     ui->graphicsView->loadBones(FileController::openFile(this, ":/tests/palma"));
 }
 
 void MainWindow::on_actionruka_triggered()
 {
-    ui->graphicsView->removeAll();
+    on_actionClear_board_triggered();
     ui->graphicsView->loadBones(FileController::openFile(this, ":/tests/ruka"));
 }
