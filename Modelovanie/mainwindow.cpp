@@ -237,7 +237,9 @@ void MainWindow::on_updateAngle()
 {
     if (_selectedBone != nullptr)
     {
+        ui->sbRotation->blockSignals(true);
         ui->sbRotation->setValue(_selectedBone->angle());
+        ui->sbRotation->blockSignals(false);
     }
 }
 
@@ -245,8 +247,12 @@ void MainWindow::on_updatePosition()
 {
     if (_selectedBone != nullptr)
     {
+        ui->sbPosX->blockSignals(true);
+        ui->sbPosY->blockSignals(true);
         ui->sbPosX->setValue(_selectedBone->pos().x());
         ui->sbPosY->setValue(_selectedBone->pos().y());
+        ui->sbPosX->blockSignals(false);
+        ui->sbPosY->blockSignals(false);
     }
 }
 
